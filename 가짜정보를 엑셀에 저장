@@ -1,0 +1,56 @@
+#-*-coding:euc-kr
+import time
+import os
+import sys
+
+try:
+    import pyexcel as px
+except ModuleNotFoundError:
+    import pip
+    pip.main(['install', 'pyexcel'])
+    pip.main(['install', 'pyexcel-xlsx'])
+    try:
+        import pyexcel as px
+    except ModuleNotFoundError:
+        time.sleep(2)
+        import pyexcel as px
+
+print("Process Start") # 작업 시작 메시지 출력
+start_time = time.time() # 시작 시간 기록
+directory = "가짜정보" # 하나로 합칠 파일이 저장된 폴더 이름
+outfile_name = "가짜정보.xlsx" # 결과 파일
+input_files = os.listdir(directory) # 폴더내의 목록 생성
+CONTENTS = [] # 데이터가 저장될 리스트
+HEADERS = [] # 헤더를 저장할 리스트
+contents_has_header = False # 헤더 입력을 위한 변수
+
+# 폴더의 내용물을 하나하나 불러와 합치는 작업을 수행합니다.
+# input_files에 저장된 파일 이름을 한 번에 하나씩 불러옵니다.
+for filename in input_files:
+    if ".txt" not in filename: # txt 파일 아니면 거름
+        continue
+    file = open(directory + "/" + filename) # txt 파일을 읽어옴
+    contents = [] # txt 파일 저장용 리스트
+
+    for line in file: # 파일의 내용물을 한 줄씩 읽어옴
+        if " >> " not in line: # >> 이 없는 라인(불량) 버림
+            continue
+        header, content = line.strip().split(" >> ") # 해당 라인 분리 (아마 [0], [1]로 나눠서 header, contant에 넣은 듯
+
+        if not contents_has_header: # 헤더가 입력되지 않았으면, 입력 (1번만 함)
+            HEADERS.append(header)
+        contents.append(content) # 헤더 외 데이터 정리
+
+    if not contents_has_header: # 헤더 입력 (1번만)
+        CONTENTS.append(HEADERS)
+        contents_has_header = True # True로 바꿈으로써 if문 실행 안 되게 함
+
+    CONTENTS.append(contents) # 헤더와 내용물 입력
+    file.close() # 읽어온 파일 종료
+
+px.save_as(array=CONTENTS, dest_file_name=outfile_name) # CONTENTS에 저장된 자료를 엑셀파일로 출력
+print("끝") # 종료 메시지
+
+# 작업에 걸린 시간 출력
+end_time = time.time()
+print(f"걸린 시간{str(end_time-start_time)}초")
