@@ -1,0 +1,55 @@
+#-*-coding:euc-kr
+import time # 시간 기록용
+import random
+import os # os 모듈을 가져오는 것
+
+print("시작") # 작업 시작 메시지
+start_time=time.time() # 시작 시간 기록
+alphabet_samples="abcdefghijklmnopqrstuvwxyz0123456789" # 이메일 생성용 글자
+phone_samples="0123456789" # 전화번호 생성용 글자
+
+# 무작위로 영어 글자를 생성하는 함수
+def random_string(length): # 이메일 및 코드 설정 부분에서 사용됨
+    result=""
+    for i in range(length):
+        result += random.choice(alphabet_samples)
+    return result
+
+# 가짜 이름 생성용 샘플
+first_name="김이박최정강조윤장임한오서신권"
+middle_name="민서도예시하주지준건하윤채수"
+last_name="준윤우원호후서현연은유민원아"
+
+os.mkdir("가짜정보") # 결과물을 저장할 폴더
+
+# 개인정보 파일 생성 함수
+num_samples=1000 # 생성할 가짜 개인 정보 파일 개수
+for i in range(num_samples):
+    while True:
+        result1, result2, result3 = "", "", "" # 무작위 사람 이름을 생성할 함수
+        result1 += random.choice(first_name)  # choice는 아무 원소나 뽑아주는 함수다 (예를 들어 first_name인 "김이박최정강조윤장임한오서신권"중 아무거나 하나를 뽑아냄
+        result2 += random.choice(middle_name)
+        if result1 == result2:
+            continue
+        result3 += random.choice(last_name)
+        if (result1 == result3) or (result2==result3):
+            continue
+        result = result1 + result2 + result3 # 사람 이름 생성
+        break
+
+    filename="가짜 정보/"+str(i+1)+"번_"+result+".txt" # 개인 정보 파일 이름
+    outfile=open(filename, 'w') # 파일 생성
+    outfile.write(f"이름 >> {result}\n")
+    outfile.write(f"나이 >> {str(random.randrange(1,111))}\n") # 나이 설정
+
+    email=random.randrange(4,11) # 이메일 글자 수 설정
+    outfile.write(f"이메일 >> {random_string(email)}@fake.com\n") # 이메일 설정
+    outfile.write(f"코드 >> {random_string(10)}\n") # 코드 설정
+    outfile.write(f"전화번호 >> 010-{random.choice(phone_samples)}{random.choice(phone_samples)}{random.choice(phone_samples)}{random.choice(phone_samples)}-{random.choice(phone_samples)}{random.choice(phone_samples)}{random.choice(phone_samples)}{random.choice(phone_samples)}\n")
+    outfile.write(f"성별 >> {random.choice(['남자', '여자'])}")
+    outfile.close() # 작성 끝
+
+print("작업 끝") # 작업 종료 메시지
+
+end_time=time.time() # 끝난 시간
+print(f"걸린 시간{str(end_time-start_time)}초")
